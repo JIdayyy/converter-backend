@@ -29,7 +29,7 @@
     "@nestjs/throttler": "^5.1.2",
     "@types/fluent-ffmpeg": "^2.1.24",
     "fluent-ffmpeg": "^2.1.2",
-    "nestjs-packages": "^0.1.5",
+    "nestjs-packages": "^0.1.6",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1"
   },

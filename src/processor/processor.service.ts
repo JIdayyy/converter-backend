@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as ffmpeg from 'fluent-ffmpeg';
-import { path } from '@ffmpeg-installer/ffmpeg';
+import * as path from '@ffmpeg-installer/ffmpeg';
 import { PassThrough } from 'stream';
 import { FFMPEG_VIDEO_CODEC } from '../convert/constants';
 import { Readable } from 'stream';
@@ -20,7 +20,7 @@ type TVideoProcessorParams = {
 @Injectable()
 export class ProcessorService implements IProcessorService {
   onModuleInit() {
-    ffmpeg.setFfmpegPath(path);
+    ffmpeg.setFfmpegPath(path.path);
   }
 
   processVideo({ stream, config }: TVideoProcessorParams): PassThrough {
