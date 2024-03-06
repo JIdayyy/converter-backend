@@ -26,12 +26,12 @@ export class ConvertController {
           fromFormat,
           outputResolution: resolution,
         },
-        serverPath: `/tmp/${name}_${resolution}_${new Date().getTime()}.${format}`,
+        serverPath: `tmp/${name}_${resolution}_${new Date().getTime()}.${format}`,
       });
       return res.json({ url });
     } catch (error) {
       console.log(error);
-      return error;
+      return res.status(500).json({ error: error.message });
     }
   }
 }
