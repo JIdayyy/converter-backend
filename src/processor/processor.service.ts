@@ -20,6 +20,8 @@ type TVideoProcessorParams = {
 @Injectable()
 export class ProcessorService implements IProcessorService {
   onModuleInit() {
+    console.log(path.path,path.version);
+
     ffmpeg.setFfmpegPath(path.path);
   }
 
