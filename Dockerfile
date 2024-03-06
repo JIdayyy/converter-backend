@@ -6,7 +6,7 @@ FROM node:14.17.6-alpine
 WORKDIR /usr/src/
 
 # copy the package.json files from local machine to the workdir in container
-COPY package*.json .
+COPY package*.json ./
 
 # run npm install in our local machine
 ENV PYTHONUNBUFFERED=1
