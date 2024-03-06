@@ -1,5 +1,5 @@
 # Base image
-FROM node:18
+FROM node:alpine
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -9,6 +9,7 @@ COPY package*.json ./
 
 # Install app dependencies
 RUN npm install
+RUN npm install @ffmpeg-installer/linux-x64 --force
 
 
 # Bundle app source
