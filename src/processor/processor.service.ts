@@ -1,10 +1,10 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as ffmpeg from 'fluent-ffmpeg';
 import { path } from '@ffmpeg-installer/ffmpeg';
 import { PassThrough } from 'stream';
 import { FFMPEG_VIDEO_CODEC } from '../convert/constants';
 import { Readable } from 'stream';
-import { IProcessorService } from '../convert/processor-service.interface';
+import { IProcessorService } from './processor-service.interface';
 
 type TVideoProcessorConfig = {
   toFormat: string;
@@ -18,7 +18,7 @@ type TVideoProcessorParams = {
 };
 
 @Injectable()
-export class FfmpegProcessorService implements IProcessorService {
+export class ProcessorService implements IProcessorService {
   onModuleInit() {
     ffmpeg.setFfmpegPath(path);
   }
@@ -50,6 +50,7 @@ export class FfmpegProcessorService implements IProcessorService {
         console.log('Stderr: %o', stderr);
       })
       .outputOption('-movflags frag_keyframe+empty_moov')
+      .withSize(config.outputResolution)
       .toFormat('mp4')
       .stream(passThrough);
 

@@ -1,4 +1,4 @@
-import { Controller, Post, Req, Res, StreamableFile } from '@nestjs/common';
+import { Controller, Post, Query, Req, Res } from '@nestjs/common';
 import { ConvertService } from './convert.service';
 import { Request, Response } from 'express';
 
@@ -9,27 +9,29 @@ export class ConvertController {
   @Post()
   async convert(
     @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
+    @Query('fileName') fileName: string,
+    @Query('resolution') resolution: string,
+    @Query('format') format: string,
   ) {
-    /* const stream = this.convertService.convertVideo({
-      stream: req,
-      config: {
-        toFormat: 'mp4',
-      },
-    });
+    try {
+      const [name, fromFormat] = fileName.split('.');
 
-    stream.on('error', (err) => {
-      console.log('Error', err);
-    });
-
-    stream.on('end', () => {
-      console.log('Stream ended');
-    });
-
-    stream.on('data', (chunk) => {
-      console.log('Chunk', chunk);
-    });
-
-    return new StreamableFile(stream);*/
+      const url = await this.convertService.convertVideo({
+        stream: req,
+        config: {
+          toFormat: format,
+          fromFormat,
+          outputResolution: resolution,
+        },
+        serverPath: `/tmp/${name}_${resolution}_${new Date().getTime()}.${format}`,
+      });
+      res.setHeader('Content-Type', 'application/json');
+      res.status(200).send({ url });
+      return url;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   }
 }

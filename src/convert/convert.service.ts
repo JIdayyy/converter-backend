@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Readable } from 'stream';
-import { IProcessorService } from './processor-service.interface';
-import { ProcessorService } from './convert.module';
+import { ProcessorService } from '../processor/processor.service';
+import { MinioService } from 'nestjs-packages';
 
 type TConvertConfig = {
   toFormat: string;
@@ -12,19 +12,27 @@ type TConvertConfig = {
 type TConvertParams = {
   stream: Readable;
   config: TConvertConfig;
+  serverPath: string;
 };
 
 @Injectable()
 export class ConvertService {
   constructor(
-    @Inject(ProcessorService)
-    private readonly processorService: IProcessorService,
+    private readonly processorService: ProcessorService,
+    private readonly minioService: MinioService,
   ) {}
 
-  convertVideo({ stream, config }: TConvertParams) {
-    this.processorService.processVideo({
+  async convertVideo({ stream, config, serverPath }: TConvertParams) {
+    const passThrough = this.processorService.processVideo({
       stream,
       config,
     });
+
+    await this.minioService.writeStream({
+      stream: passThrough,
+      serverPath,
+    });
+
+    return await this.minioService.getPresignedUrl(serverPath);
   }
 }
