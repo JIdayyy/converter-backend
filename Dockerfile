@@ -1,26 +1,21 @@
-# pull the Node.js Docker image
-FROM node:18-alpine
+# Base image
+FROM node:18
 
-# create the directory inside the container
-
-WORKDIR /usr/src/
-
+# Create app directory
 WORKDIR /usr/src/app
 
-ARG NODE_ENV
-ENV NODE_ENV $NODE_ENV
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+COPY package*.json ./
 
-COPY package*.json /usr/src/app/
+# Install app dependencies
 RUN npm install
-RUN apk update
-RUN apk add
-RUN apk add ffmpeg
-
-COPY . /usr/src/app
 
 
-# our app is running on port 5000 within the container, so need to expose it
-EXPOSE 4000
+# Bundle app source
+COPY . .
 
-# the command that starts our app
-CMD ["npm", "start"]
+# Creates a "dist" folder with the production build
+RUN npm run build
+
+# Start the server using the production build
+CMD [ "node", "dist/main.js" ]
