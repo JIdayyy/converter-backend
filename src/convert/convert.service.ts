@@ -13,6 +13,8 @@ type TConvertParams = {
   stream: Readable;
   config: TConvertConfig;
   serverPath: string;
+  onProgress?: (progress: string) => void;
+  onEnd?: () => void;
 };
 
 @Injectable()

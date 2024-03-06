@@ -25,21 +25,29 @@ export class ProcessorService implements IProcessorService {
 
   processVideo({ stream, config }: TVideoProcessorParams): PassThrough {
     const passThrough = new PassThrough();
+    let totalTime = 0;
 
     ffmpeg(stream)
       .videoCodec(FFMPEG_VIDEO_CODEC)
+      .on('codecData', (data) => {
+        // HERE YOU GET THE TOTAL TIME
+        totalTime = parseInt(data.duration.replace(/:/g, ''));
+      })
       .on('progress', (progress) => {
-        console.log('Processing: ' + progress.timemarks + '% done');
+        // HERE IS THE CURRENT TIME
+        const time = parseInt(progress.timemark.replace(/:/g, ''));
+
+        // AND HERE IS THE CALCULATION
+        const percent = (time / totalTime) * 100;
+
+        console.log('PERCENT', percent);
       })
-      .on('codecData', function (data) {
-        console.log('CODEC DATA', data);
-      })
-      .on('stderr', function (stderrLine) {
+      /*    .on('stderr', function (stderrLine) {
         console.log('Stderr output: ' + stderrLine);
       })
       .on('stdout', function (err) {
         console.log('Stdout output: ' + err.message);
-      })
+      })*/
       .on('end', (data) => {
         console.log('-------------------------------------');
         console.log(`Converted to ${config.toFormat}`, data);

@@ -26,6 +26,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/throttler": "^5.1.2",
     "@types/fluent-ffmpeg": "^2.1.24",
     "fluent-ffmpeg": "^2.1.2",
     "nestjs-packages": "^0.1.5",
