@@ -28,7 +28,7 @@ export class ConvertController {
         },
         serverPath: `tmp/${name}_${resolution}_${new Date().getTime()}.${format}`,
       });
-      return res.json({ url });
+      return res.json({ url: url.replace(/http/g, 'https') });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: error.message });

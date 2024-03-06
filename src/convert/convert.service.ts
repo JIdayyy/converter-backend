@@ -35,6 +35,6 @@ export class ConvertService {
       serverPath,
     });
 
-    return await this.minioService.getPresignedUrl(serverPath);
+    return this.minioService.getPresignedUrl(serverPath);
   }
 }
