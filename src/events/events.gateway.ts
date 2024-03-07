@@ -11,7 +11,7 @@ import { EventsService } from './events.service';
 
 @WebSocketGateway(3004, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: '*',
   },
 })
 export class EventsGateway
