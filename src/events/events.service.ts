@@ -12,8 +12,11 @@ export class EventsService {
     socket.on('disconnect', () => {
       this.connectedClients.delete(clientId);
     });
+  }
 
-    // Handle other events and messages from the client
+  handleDisconnect(socket: Socket): void {
+    const clientId = socket.id;
+    this.connectedClients.delete(clientId);
   }
 
   handleEvent(event: string, data: any): void {
