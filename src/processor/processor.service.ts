@@ -20,6 +20,11 @@ type TVideoProcessorParams = {
   config: TVideoProcessorConfig;
 };
 
+const getHHMMSS = () => {
+  const date = new Date();
+  return date.toTimeString().split(' ')[0];
+};
+
 @Injectable()
 export class ProcessorService implements IProcessorService {
   constructor(private readonly socketService: EventsService) {}
@@ -72,7 +77,10 @@ export class ProcessorService implements IProcessorService {
       })
       .on('stderr', function (stderrLine) {
         console.log('Stderr output: ' + stderrLine);
-        socketService.handleEvent('conversion-event', stderrLine);
+        socketService.handleEvent(
+          'conversion-event',
+          `${getHHMMSS()} ${stderrLine}`,
+        );
       })
       .on('end', (data) => {
         console.log('-------------------------------------');
