@@ -8,14 +8,17 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { EventsService } from './events.service';
+import { OnModuleInit } from '@nestjs/common';
 
-@WebSocketGateway(3004, {
-  cors: {
-    origin: '*',
-  },
+@WebSocketGateway(0, {
+  cors: true,
 })
 export class EventsGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+  implements
+    OnGatewayInit,
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    OnModuleInit
 {
   private readonly logger = console;
 
@@ -36,8 +39,9 @@ export class EventsGateway
     this.eventsService.handleConnection(socket);
   }
 
-  handleDisconnect(client: any) {
-    this.logger.log(`Cliend id:${client.id} disconnected`);
+  handleDisconnect(socket: Socket) {
+    this.logger.log(`Client id:${socket.id} disconnected`);
+    this.eventsService.handleDisconnect(socket);
   }
 
   @SubscribeMessage('ping')
