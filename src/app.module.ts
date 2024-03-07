@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ConvertModule } from './convert/convert.module';
+import { EventsGateway } from './events/events.gateway';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -18,6 +20,7 @@ import { ConvertModule } from './convert/convert.module';
         limit: 10,
       },
     ]),
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [

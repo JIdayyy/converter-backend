@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import * as ffmpeg from 'fluent-ffmpeg';
 import * as path from '@ffmpeg-installer/ffmpeg';
+import * as ffprobe from '@ffprobe-installer/ffprobe';
+
 import { PassThrough } from 'stream';
 import { FFMPEG_VIDEO_CODEC } from '../convert/constants';
 import { Readable } from 'stream';
 import { IProcessorService } from './processor-service.interface';
+import { EventsService } from '../events/events.service';
 
 type TVideoProcessorConfig = {
   toFormat: string;
@@ -19,15 +22,34 @@ type TVideoProcessorParams = {
 
 @Injectable()
 export class ProcessorService implements IProcessorService {
+  constructor(private readonly socketService: EventsService) {}
+
   onModuleInit() {
-    console.log(path.path,path.version);
+    console.log(path.path, path.version);
 
     ffmpeg.setFfmpegPath(path.path);
+    ffmpeg.setFfprobePath(ffprobe.path);
   }
 
   processVideo({ stream, config }: TVideoProcessorParams): PassThrough {
     const passThrough = new PassThrough();
     let totalTime = 0;
+    const socketService = this.socketService;
+    ffmpeg(stream).ffprobe(0, function (err, data) {
+      if (err) {
+        console.log('Error: ' + err);
+        return;
+      }
+      console.log('-------------------------------------');
+
+      console.dir(data, { depth: null, colors: true });
+
+      console.log('FORMAT: ' + data.format.format_name);
+      console.log('DURATION: ' + data.format.duration);
+      console.log('SIZE: ' + data.format.size);
+      console.log('BITRATE: ' + data.format.bit_rate);
+      console.log('CODEC: ' + data.format.codec_long_name);
+    });
 
     ffmpeg(stream)
       .videoCodec(FFMPEG_VIDEO_CODEC)
@@ -35,6 +57,7 @@ export class ProcessorService implements IProcessorService {
         // HERE YOU GET THE TOTAL TIME
         totalTime = parseInt(data.duration.replace(/:/g, ''));
       })
+
       .on('progress', (progress) => {
         // HERE IS THE CURRENT TIME
         const time = parseInt(progress.timemark.replace(/:/g, ''));
@@ -43,6 +66,17 @@ export class ProcessorService implements IProcessorService {
         const percent = (time / totalTime) * 100;
 
         console.log('PERCENT', percent);
+      })
+      .on('stdout', function (err) {
+        console.log('Stdout output: ' + err.message);
+      })
+      .on('stderr', function (stderrLine) {
+        console.log('Stderr output: ' + stderrLine);
+        socketService.handleEvent('conversion-event', stderrLine);
+      })
+      .on('end', (data) => {
+        console.log('-------------------------------------');
+        console.log(`Converted to ${config.toFormat}`, data);
       })
       /*    .on('stderr', function (stderrLine) {
         console.log('Stderr output: ' + stderrLine);
